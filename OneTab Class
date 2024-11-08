@@ -1,0 +1,76 @@
+class OneTab
+{
+
+    constructor(x, y, w, h)
+    { 
+        this.x= x;
+        this.y= y;
+        this.w= w;
+        this.h= h;
+        this.angle= 0;
+				this.clickCount= 0; //tracks amount of clicks on close button
+				this.clickDisabled= false; //disables button 
+
+    }
+
+    display()
+    {
+        fill(255);
+        stroke(10);
+        strokeWeight(4);
+        rect(this.x, this.y, this.w, this.h, 10);
+
+        stroke(10);
+        fill(175, 175, 175); //gray
+        rect(this.x, this.y, this.w, this.h/7, 10);
+
+        fill(200, 0, 0); //draws red close tab button
+        stroke(3);
+        rect(this.x+ (this.w - 20), this.y+ 5, 15, 15);
+
+        fill(255);
+        textAlign(CENTER, CENTER);
+        textSize(12);
+        text("X", this.x+ (this.w - 12), this.y+ 13);
+
+        this.loadingAnim();
+
+    }
+
+    loadingAnim()
+    {
+        let size= 75;
+        let lX= this.x+ this.w/2;
+        let lY= this.y+ this.h/1.8;
+
+        noFill();
+        stroke(8, 198, 19); //green
+        strokeWeight(6);
+        
+        arc(lX, lY, size, size, this.angle, this.angle+ HALF_PI);
+        arc(lX, lY, size/2, size/2, this.angle, this.angle+ HALF_PI);
+        
+        this.angle+= 0.5;
+        if(this.angle>= TWO_PI)
+        {
+          this.angle=0;
+        }
+
+    }
+
+    buttonClicked(mX, mY)
+        {
+            return (mX> this.x+ (this.w - 20) && mX< this.x+ (this.w - 5) && mY > this.y+ 5 && mY < this.y+ 20);
+        }
+		
+		cantClick()
+		{
+			this.clickCount++;
+			if(this.clickCount>= 3)
+				{
+					this.clickDisabled= true;
+				}
+		}
+
+    
+}
