@@ -1,0 +1,238 @@
+let tabs= []; //holds tab objects
+let onetab= [];
+let maxTabs; //random range for max num of tabs
+let loadProg= 0; //start for loading progress
+let spam= false;
+let spamCount= 0;
+let maxSpam;
+let clicks= 0;
+
+let bX = 200; //ball x loc
+let bSpeed= 1.2;
+let lag= 0.2;
+let bSize= 20;
+
+let randR, randG, randB;
+let randColor;
+let scene= 0; //scene count
+
+function setup()
+{
+    createCanvas(800, 600);
+    tabs.push(new Tab(width/2, height/2, 250, 175)); //first tab
+		onetab.push(new OneTab(width/2, height/2, 250, 175)); //first tab
+
+    randR= floor(random(0, 255));
+    randG = floor(random(0, 255));
+    randB = floor(random(0, 255));
+    randColor=color(randR, randG, randB);
+		maxTabs= random(20, 50);
+		maxSpam= random(20, 40); //make from 50 to 100
+		
+
+}
+
+function draw()
+{
+
+    if(scene=== 0)
+    {
+				background(randColor);
+			
+        for(let i= 0; i< tabs.length; i++)
+        {
+            tabs[i].display(); // gets tab out of array
+        }
+
+        if(tabs.length>= maxTabs)
+        {
+            scene= 1; // changes scene
+        }
+        
+    }
+    else if(scene=== 1)
+    {
+				background(randColor);
+        loadBar();
+        spamButton();
+        ball();
+        ball2();
+        ball3();
+			
+			
+    }
+		else if(scene=== 2)
+			{
+				background(randColor); 
+				
+				for(let i= 0; i< onetab.length; i++)
+        {
+            onetab[i].display();
+        }
+				
+			}
+    
+
+}
+
+function loadBar()
+{
+    stroke(0); 
+    strokeWeight(4);
+    fill(185, 185, 185); //light gray
+    rect(200, height / 2 - 20, 400, 40, 10); //gray background
+
+    stroke(0);
+    strokeWeight(2);
+    fill(8, 198, 19);//green
+    rect(200, height / 2 - 20, loadProg, 40, 10); //actual load bar
+
+    fill(0);
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    text(loadProg/4 + "%", width/2, height/2); //displays the percentage
+}
+
+function spamButton()
+{
+    stroke(0);
+    strokeWeight(4);
+    fill(211, 28, 0); //dark red
+     rect(width/2- 50, height/2+ 50, 100, 40);
+}
+
+function ball()
+{
+    if (bX<200 +loadProg) //ball moves as the load bar increases
+    {
+      fill(255);
+      stroke(0);
+      strokeWeight(3);
+      ellipse(bX, height/2-40, bSize, bSize);
+    }
+  
+    bX+= bSpeed;
+  
+    if (bX>= 600) //makes ball go back to initial loc when it reaches the end of the load bar
+    {
+      bX= 200;
+    }
+}
+  
+  function ball2()
+  {
+    if (bX<200 +loadProg)
+    {
+      fill(255);
+      stroke(0);
+      strokeWeight(3);
+      ellipse(bX-50, height/2-40, bSize/1.5, bSize/1.5);
+    }
+  
+    bX+= bSpeed/lag;
+  
+    if (bX>= 600)
+    {
+      bX= 200;
+    }
+  }
+  
+  function ball3()
+  {
+    if (bX<200 +loadProg)
+    {
+      fill(255);
+      stroke(0);
+      strokeWeight(3);
+      ellipse(bX-100, height/2-40, bSize/2, bSize/2);
+    }
+  
+    bX+= bSpeed/lag;
+  
+    if (bX>= 600)
+    {
+      bX= 200;
+    }
+  }
+
+  function mousePressed()
+  {
+    if(scene=== 0)
+    {
+        for(let i= 0; i< tabs.length; i++)
+        {
+            let tab = tabs[i];
+            if(tab.buttonClicked(mouseX, mouseY)) //new tab appears at a random position when mouse is pressed
+            {
+                let newTab = new Tab(random(width- 150), random(height- 100), 250, 175);
+                tabs.push(newTab);
+                background(randColor);
+                return; //gets out of loop
+            }
+        }
+    }
+
+    if(scene=== 1)
+    {
+        if(mouseX> width/2- 50 && mouseX< width/2+50 &&
+        mouseY> height/2+ 50 && mouseY< height/2+ 100)
+        {
+            if(loadProg< (width/2-50) *random(0.95, 1.08))
+            {
+                loadProg+= 5;
+            } 
+            else
+            {
+                spam= true;
+
+            }
+        } //when red button is pressed, load progress increases until it reaches 83-95%
+    }
+		
+		if(scene=== 2)
+			{
+				for(let i= 0; i< onetab.length; i++)
+        {
+            let oneTab = onetab[i];
+            if(oneTab.buttonClicked(mouseX, mouseY))
+            {
+								oneTab.clickCount++;
+								let newTab = new OneTab(random(width- 150), random(height- 100), 250, 175);
+                onetab.push(newTab);
+                background(randColor);
+							
+								if(oneTab.clickCount<= 1)
+									{
+										onetab.splice(i, 1); //deletes 2 tabs for every 3 clicks
+									}
+									
+                return; //gets out of loop
+            }
+        }
+			}
+		
+
+    if(spam)
+    {
+        spamCount++;
+        clicks=1;
+        loadProg+=clicks;
+        loadProg-= 1.5;
+
+        if(loadProg<0)
+        {
+            loadProg= 0;
+        } //prevents load bar from going to 100%
+			
+        if(spamCount>= maxSpam)
+        {
+            spam= false;
+            scene= 2;
+            loadProg= 0;
+            loadProg-= 0.5;
+        }
+
+    }
+
+    
+  }
